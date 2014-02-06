@@ -9,4 +9,4 @@ Run the following command
 
     vagrant up
     
-Then connect to 192.168.56.10x:8091 (Where x is the node ID)
+Then connect to 192.168.56.110:8091 to view the master node

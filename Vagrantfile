@@ -12,20 +12,31 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ipAddrPrefix = "192.168.56.10"
 
   config.vm.provider "virtualbox" do |v|
+    v.gui = false
     v.customize ["modifyvm", :id, "--memory", 756]
   end
 
-  config.vm.provision :puppet
-
-  config.vm.define "masternode" do |node|
+  config.vm.define "mastercouch" do |node|
     node.vm.box = "precise64"
-    node.vm.hostname = "masternode"
+    node.vm.hostname = "mastercouch"
     node.vm.network :private_network, ip: "192.168.56.110"
     node.vm.provider "virtualbox" do |v|
-      v.name = "Couchbase Server master Node"
+      v.name = "Couchbase master Node"
+    end
+
+    node.vm.provision :chef_client do |chef|
+      chef.node_name = "mastercouch"
+      chef.chef_server_url = "https://api.opscode.com/organizations/bmontague"
+      chef.validation_key_path = "~/Dropbox/code/chef-repo/.chef/bmontague-validator.pem"
+      chef.validation_client_name = "bmontague-validator"
+      chef.add_role("couchbase_master")
+      chef.delete_node = true
+      chef.delete_client = true
+      chef.environment = "development"
     end
   end
 
+=begin
   1.upto(numNodes) do |num|
     nodeName = ("node" + num.to_s).to_sym
     config.vm.define nodeName do |node|
@@ -37,4 +48,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
   end
+=end
 end
